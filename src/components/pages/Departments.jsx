@@ -29,14 +29,14 @@ const Departments = () => {
     setShowModal(true);
   };
 
-  const handleSaveDepartment = async (departmentData) => {
+const handleSaveDepartment = async (departmentData) => {
     setSaving(true);
     try {
       if (selectedDepartment) {
-        await departmentService.updateRecord(departmentData.Id, departmentData);
+        await departmentService.update(departmentData.Id, departmentData);
         toast.success("Department updated successfully!");
       } else {
-        await departmentService.createRecord(departmentData);
+        await departmentService.create(departmentData);
         toast.success("Department created successfully!");
       }
       setShowModal(false);
