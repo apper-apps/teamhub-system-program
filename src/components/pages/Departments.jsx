@@ -227,8 +227,7 @@ onAction={handleCreateDepartment}
             </div>
           </div>
         </Card>
-
-        <Card>
+<Card>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Team Size</p>
@@ -241,7 +240,6 @@ onAction={handleCreateDepartment}
             </div>
           </div>
         </Card>
-</Card>
       </div>
 
       <DepartmentModal
