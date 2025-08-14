@@ -65,11 +65,11 @@ const DepartmentModal = ({ isOpen, onClose, department, onSave, employees = [] }
       return;
     }
 
-    const departmentData = {
+const departmentData = {
       Name: formData.name,
       description_c: formData.description,
       employee_count_c: parseInt(formData.employeeCount),
-      manager_id_c: formData.managerId || null,
+      manager_id_c: formData.managerId ? parseInt(formData.managerId) : null,
     };
 
     if (department) {
