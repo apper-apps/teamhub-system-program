@@ -45,13 +45,17 @@ const DepartmentModal = ({ isOpen, onClose, department, onSave, employees = [] }
     { id: "settings", label: "Settings", icon: "Settings" },
   ];
 
-  const validateForm = () => {
+const validateForm = () => {
     const newErrors = {};
     
     if (!formData.name.trim()) newErrors.name = "Department name is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
-    if (!formData.employeeCount || isNaN(formData.employeeCount) || parseInt(formData.employeeCount) < 0) {
-      newErrors.employeeCount = "Please enter a valid employee count";
+    
+    // Only validate employeeCount if a value is provided
+    if (formData.employeeCount && formData.employeeCount.trim()) {
+      if (isNaN(formData.employeeCount) || parseInt(formData.employeeCount) < 0) {
+        newErrors.employeeCount = "Please enter a valid employee count";
+      }
     }
 
     setErrors(newErrors);
