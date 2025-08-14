@@ -76,16 +76,16 @@ const Departments = () => {
 
       {/* Department Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {departments.map((department) => {
-          const deptEmployees = getDepartmentEmployees(department.name);
-          const manager = getDepartmentManager(department.name);
+{departments.map((department) => {
+          const deptEmployees = getDepartmentEmployees(department.Name);
+          const manager = getDepartmentManager(department.Name);
           
           return (
             <Card key={department.Id} hover className="group">
               <div className="flex items-center justify-between mb-4">
                 <div className="h-12 w-12 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-lg flex items-center justify-center">
                   <ApperIcon 
-                    name={getDepartmentIcon(department.name)} 
+                    name={getDepartmentIcon(department.Name)} 
                     className="h-6 w-6 text-primary-600" 
                   />
                 </div>
@@ -100,12 +100,12 @@ const Departments = () => {
                 </div>
               </div>
               
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {department.name}
+<h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {department.Name}
               </h3>
               
               <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                {department.description}
+                {department.description_c}
               </p>
               
               <div className="space-y-3">

@@ -8,7 +8,7 @@ class DepartmentService {
     this.tableName = 'department_c';
   }
 
-  async getAll() {
+async getAll() {
     try {
       const params = {
         fields: [
@@ -18,22 +18,15 @@ class DepartmentService {
           { field: { Name: "description_c" } }
         ]
       };
-
+      
       const response = await this.apperClient.fetchRecords(this.tableName, params);
       
       if (!response.success) {
         console.error(response.message);
         throw new Error(response.message);
       }
-
-      // Map database fields to UI fields
-      return response.data.map(dept => ({
-        Id: dept.Id,
-        name: dept.Name || '',
-        managerId: dept.manager_id_c || '',
-        employeeCount: dept.employee_count_c || 0,
-        description: dept.description_c || ''
-      }));
+      
+      return response.data || [];
     } catch (error) {
       console.error("Error fetching departments:", error.message);
       throw error;
@@ -50,79 +43,48 @@ class DepartmentService {
           { field: { Name: "description_c" } }
         ]
       };
-
-      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      const response = await this.apperClient.getRecordById(this.tableName, id, params);
       
       if (!response.success) {
         console.error(response.message);
-        return null;
+        throw new Error(response.message);
       }
-
-      if (!response.data) {
-        return null;
-      }
-
-      // Map database fields to UI fields
-      const dept = response.data;
-      return {
-        Id: dept.Id,
-        name: dept.Name || '',
-        managerId: dept.manager_id_c || '',
-        employeeCount: dept.employee_count_c || 0,
-        description: dept.description_c || ''
-      };
+      
+      return response.data;
     } catch (error) {
       console.error(`Error fetching department with ID ${id}:`, error.message);
-      return null;
+      throw error;
     }
   }
 
   async create(departmentData) {
     try {
-      // Map UI fields to database fields, only Updateable fields
-      const dbData = {
-        Name: departmentData.name || '',
-        manager_id_c: departmentData.managerId ? parseInt(departmentData.managerId) : null,
-        employee_count_c: departmentData.employeeCount || 0,
-        description_c: departmentData.description || ''
-      };
-
+      // Only include Updateable fields
       const params = {
-        records: [dbData]
+        records: [{
+          Name: departmentData.Name,
+          manager_id_c: departmentData.manager_id_c ? parseInt(departmentData.manager_id_c) : null,
+          employee_count_c: departmentData.employee_count_c ? parseInt(departmentData.employee_count_c) : null,
+          description_c: departmentData.description_c
+        }]
       };
-
+      
       const response = await this.apperClient.createRecord(this.tableName, params);
       
       if (!response.success) {
         console.error(response.message);
         throw new Error(response.message);
       }
-
+      
       if (response.results) {
-        const successfulRecords = response.results.filter(result => result.success);
         const failedRecords = response.results.filter(result => !result.success);
-        
         if (failedRecords.length > 0) {
           console.error(`Failed to create department ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
-          
-          failedRecords.forEach(record => {
-            record.errors?.forEach(error => {
-              throw new Error(`${error.fieldLabel}: ${error.message}`);
-            });
-            if (record.message) throw new Error(record.message);
-          });
+          throw new Error(failedRecords[0].message || 'Failed to create department');
         }
         
-        if (successfulRecords.length > 0) {
-          const newDept = successfulRecords[0].data;
-          return {
-            Id: newDept.Id,
-            name: newDept.Name || '',
-            managerId: newDept.manager_id_c || '',
-            employeeCount: newDept.employee_count_c || 0,
-            description: newDept.description_c || ''
-          };
-        }
+        return response.results[0].data;
       }
     } catch (error) {
       console.error("Error creating department:", error.message);
@@ -132,54 +94,35 @@ class DepartmentService {
 
   async update(id, departmentData) {
     try {
-      // Map UI fields to database fields, only Updateable fields
-      const dbData = {
-        Id: parseInt(id),
-        Name: departmentData.name || '',
-        manager_id_c: departmentData.managerId ? parseInt(departmentData.managerId) : null,
-        employee_count_c: departmentData.employeeCount || 0,
-        description_c: departmentData.description || ''
-      };
-
+      // Only include Updateable fields plus Id
       const params = {
-        records: [dbData]
+        records: [{
+          Id: parseInt(id),
+          Name: departmentData.Name,
+          manager_id_c: departmentData.manager_id_c ? parseInt(departmentData.manager_id_c) : null,
+          employee_count_c: departmentData.employee_count_c ? parseInt(departmentData.employee_count_c) : null,
+          description_c: departmentData.description_c
+        }]
       };
-
+      
       const response = await this.apperClient.updateRecord(this.tableName, params);
       
       if (!response.success) {
         console.error(response.message);
         throw new Error(response.message);
       }
-
+      
       if (response.results) {
-        const successfulUpdates = response.results.filter(result => result.success);
-        const failedUpdates = response.results.filter(result => !result.success);
-        
-        if (failedUpdates.length > 0) {
-          console.error(`Failed to update department ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
-          
-          failedUpdates.forEach(record => {
-            record.errors?.forEach(error => {
-              throw new Error(`${error.fieldLabel}: ${error.message}`);
-            });
-            if (record.message) throw new Error(record.message);
-          });
+        const failedRecords = response.results.filter(result => !result.success);
+        if (failedRecords.length > 0) {
+          console.error(`Failed to update department ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          throw new Error(failedRecords[0].message || 'Failed to update department');
         }
         
-        if (successfulUpdates.length > 0) {
-          const updatedDept = successfulUpdates[0].data;
-          return {
-            Id: updatedDept.Id,
-            name: updatedDept.Name || '',
-            managerId: updatedDept.manager_id_c || '',
-            employeeCount: updatedDept.employee_count_c || 0,
-            description: updatedDept.description_c || ''
-          };
-        }
+        return response.results[0].data;
       }
     } catch (error) {
-      console.error("Error updating department:", error.message);
+      console.error(`Error updating department with ID ${id}:`, error.message);
       throw error;
     }
   }
@@ -189,33 +132,29 @@ class DepartmentService {
       const params = {
         RecordIds: [parseInt(id)]
       };
-
+      
       const response = await this.apperClient.deleteRecord(this.tableName, params);
       
       if (!response.success) {
         console.error(response.message);
         throw new Error(response.message);
       }
-
+      
       if (response.results) {
-        const successfulDeletions = response.results.filter(result => result.success);
-        const failedDeletions = response.results.filter(result => !result.success);
-        
-        if (failedDeletions.length > 0) {
-          console.error(`Failed to delete department ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
-          
-          failedDeletions.forEach(record => {
-            if (record.message) throw new Error(record.message);
-          });
+        const failedRecords = response.results.filter(result => !result.success);
+        if (failedRecords.length > 0) {
+          console.error(`Failed to delete department ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          throw new Error(failedRecords[0].message || 'Failed to delete department');
         }
         
-        return successfulDeletions.length > 0;
+        return true;
       }
     } catch (error) {
-      console.error("Error deleting department:", error.message);
+      console.error(`Error deleting department with ID ${id}:`, error.message);
       throw error;
     }
   }
+
 }
 
 export default new DepartmentService();
