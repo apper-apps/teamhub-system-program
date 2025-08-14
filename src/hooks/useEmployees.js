@@ -67,6 +67,22 @@ export const useEmployees = () => {
     }
   };
 
+const getEmployeeAvailability = async (employeeId, startDate, endDate) => {
+    try {
+      return await employeeService.getEmployeeAvailability(employeeId, startDate, endDate);
+    } catch (err) {
+      throw new Error(err.message || "Failed to get employee availability");
+    }
+  };
+
+  const getEmployeeLeaveRequests = async (employeeId) => {
+    try {
+      return await employeeService.getLeaveRequests(employeeId);
+    } catch (err) {
+      throw new Error(err.message || "Failed to get employee leave requests");
+    }
+  };
+
   return {
     employees,
     loading,
@@ -75,6 +91,8 @@ export const useEmployees = () => {
     updateEmployee,
     deleteEmployee,
     searchEmployees,
+    getEmployeeAvailability,
+    getEmployeeLeaveRequests,
     refetch: loadEmployees,
   };
 };

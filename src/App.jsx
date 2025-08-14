@@ -8,6 +8,7 @@ import Employees from "@/components/pages/Employees";
 import EmployeeDetail from "@/components/pages/EmployeeDetail";
 import AddEmployee from "@/components/pages/AddEmployee";
 import Departments from "@/components/pages/Departments";
+import Calendar from "@/components/pages/Calendar";
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,12 +22,13 @@ const App = () => {
           <Header onMenuClick={() => setSidebarOpen(true)} />
           
           <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
-            <Routes>
+<Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/employees" element={<Employees />} />
               <Route path="/employees/new" element={<AddEmployee />} />
               <Route path="/employees/:id" element={<EmployeeDetail />} />
               <Route path="/departments" element={<Departments />} />
+              <Route path="/calendar" element={<Calendar />} />
             </Routes>
           </main>
         </div>

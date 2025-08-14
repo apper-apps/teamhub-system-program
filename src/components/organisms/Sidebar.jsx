@@ -5,7 +5,7 @@ import ApperIcon from "@/components/ApperIcon";
 const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
-  const navigationItems = [
+const navigationItems = [
     {
       name: "Dashboard",
       path: "/",
@@ -15,6 +15,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       name: "Employees",
       path: "/employees",
       icon: "Users",
+    },
+    {
+      name: "Calendar",
+      path: "/calendar",
+      icon: "Calendar",
     },
     {
       name: "Departments",

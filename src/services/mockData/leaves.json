@@ -1,0 +1,99 @@
+[
+  {
+    "Id": 1,
+    "employeeId": 1,
+    "startDate": "2024-02-15T00:00:00.000Z",
+    "endDate": "2024-02-17T00:00:00.000Z",
+    "type": "Vacation",
+    "status": "Approved",
+    "reason": "Family vacation",
+    "requestDate": "2024-01-20T00:00:00.000Z",
+    "approvedBy": "David Wilson",
+    "approvedDate": "2024-01-22T00:00:00.000Z"
+  },
+  {
+    "Id": 2,
+    "employeeId": 2,
+    "startDate": "2024-02-20T00:00:00.000Z",
+    "endDate": "2024-02-20T00:00:00.000Z",
+    "type": "Sick Leave",
+    "status": "Pending",
+    "reason": "Medical appointment",
+    "requestDate": "2/18/2024 12:00:00 AMZ",
+    "approvedBy": null,
+    "approvedDate": null
+  },
+  {
+    "Id": 3,
+    "employeeId": 3,
+    "startDate": "2024-02-25T00:00:00.000Z",
+    "endDate": "2024-02-28T00:00:00.000Z",
+    "type": "Personal Leave",
+    "status": "Rejected",
+    "reason": "Personal matters",
+    "requestDate": "2/10/2024 12:00:00 AMZ",
+    "approvedBy": "Lisa Anderson",
+    "approvedDate": "2024-02-12T00:00:00.000Z",
+    "rejectionReason": "Project deadline approaching"
+  },
+  {
+    "Id": 4,
+    "employeeId": 4,
+    "startDate": "2024-03-05T00:00:00.000Z",
+    "endDate": "2024-03-08T00:00:00.000Z",
+    "type": "Vacation",
+    "status": "Approved",
+    "reason": "Spring break",
+    "requestDate": "2024-02-01T00:00:00.000Z",
+    "approvedBy": "Sarah Johnson",
+    "approvedDate": "2024-02-03T00:00:00.000Z"
+  },
+  {
+    "Id": 5,
+    "employeeId": 5,
+    "startDate": "2024-03-12T00:00:00.000Z",
+    "endDate": "2024-03-12T00:00:00.000Z",
+    "type": "Sick Leave",
+    "status": "Approved",
+    "reason": "Flu symptoms",
+    "requestDate": "2024-03-11T00:00:00.000Z",
+    "approvedBy": "David Wilson",
+    "approvedDate": "2024-03-11T00:00:00.000Z"
+  },
+  {
+    "Id": 6,
+    "employeeId": 6,
+    "startDate": "2024-03-18T00:00:00.000Z",
+    "endDate": "2024-03-22T00:00:00.000Z",
+    "type": "Vacation",
+    "status": "Pending",
+    "reason": "Family wedding",
+    "requestDate": "2024-03-01T00:00:00.000Z",
+    "approvedBy": null,
+    "approvedDate": null
+  },
+  {
+    "Id": 7,
+    "employeeId": 7,
+    "startDate": "2024-04-01T00:00:00.000Z",
+    "endDate": "2024-04-03T00:00:00.000Z",
+    "type": "Personal Leave",
+    "status": "Approved",
+    "reason": "Moving to new apartment",
+    "requestDate": "2024-03-15T00:00:00.000Z",
+    "approvedBy": "David Wilson",
+    "approvedDate": "2024-03-17T00:00:00.000Z"
+  },
+  {
+    "Id": 8,
+    "employeeId": 8,
+    "startDate": "2024-04-10T00:00:00.000Z",
+    "endDate": "2024-04-12T00:00:00.000Z",
+    "type": "Sick Leave",
+    "status": "Pending",
+    "reason": "Surgery recovery",
+    "requestDate": "2024-04-01T00:00:00.000Z",
+    "approvedBy": null,
+    "approvedDate": null
+  }
+]

@@ -85,6 +85,23 @@ class EmployeeService {
       .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
       .slice(0, limit);
   }
+async getLeaveRequests(employeeId) {
+    await this.delay(200);
+    // This would normally fetch from a leave requests service
+    // For now, we'll return empty array as leave requests are managed separately
+    return [];
+  }
+
+  async getEmployeeAvailability(employeeId, startDate, endDate) {
+    await this.delay(200);
+    // This would calculate availability based on leave requests
+    // For now, return available (no leaves)
+    return {
+      employeeId,
+      available: true,
+      leaveRequests: []
+    };
+  }
 
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
