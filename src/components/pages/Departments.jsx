@@ -1,16 +1,54 @@
 import React, { useState } from "react";
-import Button from "@/components/atoms/Button";
-import Card from "@/components/atoms/Card";
+import DepartmentModal from "@/components/organisms/DepartmentModal";
+import { useDepartments } from "@/hooks/useDepartments";
+import { useEmployees } from "@/hooks/useEmployees";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import { useDepartments } from "@/hooks/useDepartments";
-import { useEmployees } from "@/hooks/useEmployees";
-
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
+import Employees from "@/components/pages/Employees";
+import departmentService from "@/services/api/departmentService";
 const Departments = () => {
   const { departments, loading: departmentsLoading, error: departmentsError, refetch } = useDepartments();
   const { employees } = useEmployees();
+  
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleCreateDepartment = () => {
+    setSelectedDepartment(null);
+    setShowModal(true);
+  };
+
+  const handleEditDepartment = (department) => {
+    setSelectedDepartment(department);
+    setShowModal(true);
+  };
+
+  const handleSaveDepartment = async (departmentData) => {
+    setSaving(true);
+    try {
+      if (selectedDepartment) {
+        await departmentService.updateRecord(departmentData.Id, departmentData);
+        toast.success("Department updated successfully!");
+      } else {
+        await departmentService.createRecord(departmentData);
+        toast.success("Department created successfully!");
+      }
+      setShowModal(false);
+      setSelectedDepartment(null);
+      refetch();
+    } catch (error) {
+      console.error("Error saving department:", error);
+      toast.error("Failed to save department. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (departmentsLoading) {
     return <Loading />;
@@ -26,7 +64,7 @@ const Departments = () => {
         title="No departments found"
         description="Start organizing your team by creating your first department."
         actionLabel="Create Department"
-        onAction={() => {/* Handle create department */}}
+onAction={handleCreateDepartment}
         icon="Building2"
       />
     );
@@ -64,9 +102,10 @@ const Departments = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button
+<Button
               variant="primary"
               icon="Plus"
+              onClick={handleCreateDepartment}
             >
               Add Department
             </Button>
@@ -202,7 +241,19 @@ const Departments = () => {
             </div>
           </div>
         </Card>
+</Card>
       </div>
+
+      <DepartmentModal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedDepartment(null);
+        }}
+        department={selectedDepartment}
+        onSave={handleSaveDepartment}
+        employees={employees || []}
+      />
     </div>
   );
 };
