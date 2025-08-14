@@ -24,9 +24,20 @@ const Header = ({ onMenuClick, title, subtitle }) => {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+<div className="flex items-center gap-4">
             <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors duration-200">
               <ApperIcon name="Bell" className="h-5 w-5" />
+            </button>
+            
+            <button 
+              onClick={() => {
+                const { AuthContext } = require('@/App');
+                const { logout } = React.useContext(AuthContext);
+                logout();
+              }}
+              className="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            >
+              Logout
             </button>
             
             <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">

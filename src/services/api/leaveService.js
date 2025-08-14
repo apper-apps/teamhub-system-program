@@ -1,121 +1,596 @@
-import leavesData from "@/services/mockData/leaves.json";
-
 class LeaveService {
   constructor() {
-    this.leaves = [...leavesData];
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'leave_c';
   }
 
   async getAll() {
-    await this.delay(300);
-    return [...this.leaves];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "employee_id_c" } },
+          { field: { Name: "start_date_c" } },
+          { field: { Name: "end_date_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "reason_c" } },
+          { field: { Name: "request_date_c" } },
+          { field: { Name: "approved_by_c" } },
+          { field: { Name: "approved_date_c" } },
+          { field: { Name: "rejection_reason_c" } }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      // Map database fields to UI fields
+      return response.data.map(leave => ({
+        Id: leave.Id,
+        employeeId: leave.employee_id_c?.Id || leave.employee_id_c,
+        startDate: leave.start_date_c || '',
+        endDate: leave.end_date_c || '',
+        type: leave.type_c || '',
+        status: leave.status_c || 'Pending',
+        reason: leave.reason_c || '',
+        requestDate: leave.request_date_c || '',
+        approvedBy: leave.approved_by_c || null,
+        approvedDate: leave.approved_date_c || null,
+        rejectionReason: leave.rejection_reason_c || null
+      }));
+    } catch (error) {
+      console.error("Error fetching leaves:", error.message);
+      throw error;
+    }
   }
 
   async getById(id) {
-    await this.delay(200);
-    const leave = this.leaves.find(leave => leave.Id === parseInt(id));
-    return leave ? { ...leave } : null;
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "employee_id_c" } },
+          { field: { Name: "start_date_c" } },
+          { field: { Name: "end_date_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "reason_c" } },
+          { field: { Name: "request_date_c" } },
+          { field: { Name: "approved_by_c" } },
+          { field: { Name: "approved_date_c" } },
+          { field: { Name: "rejection_reason_c" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      if (!response.data) {
+        return null;
+      }
+
+      // Map database fields to UI fields
+      const leave = response.data;
+      return {
+        Id: leave.Id,
+        employeeId: leave.employee_id_c?.Id || leave.employee_id_c,
+        startDate: leave.start_date_c || '',
+        endDate: leave.end_date_c || '',
+        type: leave.type_c || '',
+        status: leave.status_c || 'Pending',
+        reason: leave.reason_c || '',
+        requestDate: leave.request_date_c || '',
+        approvedBy: leave.approved_by_c || null,
+        approvedDate: leave.approved_date_c || null,
+        rejectionReason: leave.rejection_reason_c || null
+      };
+    } catch (error) {
+      console.error(`Error fetching leave with ID ${id}:`, error.message);
+      return null;
+    }
   }
 
   async getByEmployeeId(employeeId) {
-    await this.delay(200);
-    return this.leaves.filter(leave => leave.employeeId === parseInt(employeeId));
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "employee_id_c" } },
+          { field: { Name: "start_date_c" } },
+          { field: { Name: "end_date_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "reason_c" } },
+          { field: { Name: "request_date_c" } },
+          { field: { Name: "approved_by_c" } },
+          { field: { Name: "approved_date_c" } },
+          { field: { Name: "rejection_reason_c" } }
+        ],
+        where: [
+          {
+            FieldName: "employee_id_c",
+            Operator: "EqualTo",
+            Values: [parseInt(employeeId)]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      // Map database fields to UI fields
+      return response.data.map(leave => ({
+        Id: leave.Id,
+        employeeId: leave.employee_id_c?.Id || leave.employee_id_c,
+        startDate: leave.start_date_c || '',
+        endDate: leave.end_date_c || '',
+        type: leave.type_c || '',
+        status: leave.status_c || 'Pending',
+        reason: leave.reason_c || '',
+        requestDate: leave.request_date_c || '',
+        approvedBy: leave.approved_by_c || null,
+        approvedDate: leave.approved_date_c || null,
+        rejectionReason: leave.rejection_reason_c || null
+      }));
+    } catch (error) {
+      console.error("Error fetching leaves by employee ID:", error.message);
+      return [];
+    }
   }
 
   async getByDateRange(startDate, endDate) {
-    await this.delay(300);
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    return this.leaves.filter(leave => {
-      const leaveStart = new Date(leave.startDate);
-      const leaveEnd = new Date(leave.endDate);
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "employee_id_c" } },
+          { field: { Name: "start_date_c" } },
+          { field: { Name: "end_date_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "reason_c" } },
+          { field: { Name: "request_date_c" } },
+          { field: { Name: "approved_by_c" } },
+          { field: { Name: "approved_date_c" } },
+          { field: { Name: "rejection_reason_c" } }
+        ],
+        whereGroups: [
+          {
+            operator: "AND",
+            subGroups: [
+              {
+                conditions: [
+                  {
+                    fieldName: "start_date_c",
+                    operator: "LessThanOrEqualTo",
+                    values: [endDate]
+                  }
+                ]
+              },
+              {
+                conditions: [
+                  {
+                    fieldName: "end_date_c",
+                    operator: "GreaterThanOrEqualTo",
+                    values: [startDate]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
       
-      // Check if leave overlaps with the date range
-      return leaveStart <= end && leaveEnd >= start;
-    });
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      // Map database fields to UI fields
+      return response.data.map(leave => ({
+        Id: leave.Id,
+        employeeId: leave.employee_id_c?.Id || leave.employee_id_c,
+        startDate: leave.start_date_c || '',
+        endDate: leave.end_date_c || '',
+        type: leave.type_c || '',
+        status: leave.status_c || 'Pending',
+        reason: leave.reason_c || '',
+        requestDate: leave.request_date_c || '',
+        approvedBy: leave.approved_by_c || null,
+        approvedDate: leave.approved_date_c || null,
+        rejectionReason: leave.rejection_reason_c || null
+      }));
+    } catch (error) {
+      console.error("Error fetching leaves by date range:", error.message);
+      return [];
+    }
   }
 
   async create(leaveData) {
-    await this.delay(400);
-    const newId = Math.max(...this.leaves.map(leave => leave.Id)) + 1;
-    const newLeave = {
-      ...leaveData,
-      Id: newId,
-      requestDate: new Date().toISOString(),
-      status: "Pending",
-      approvedBy: null,
-      approvedDate: null
-    };
-    this.leaves.push(newLeave);
-    return { ...newLeave };
+    try {
+      // Map UI fields to database fields, only Updateable fields
+      const dbData = {
+        Name: `Leave Request - ${leaveData.type}`,
+        employee_id_c: parseInt(leaveData.employeeId),
+        start_date_c: leaveData.startDate,
+        end_date_c: leaveData.endDate,
+        type_c: leaveData.type || 'Vacation',
+        status_c: leaveData.status || 'Pending',
+        reason_c: leaveData.reason || '',
+        request_date_c: leaveData.requestDate || new Date().toISOString(),
+        approved_by_c: leaveData.approvedBy || null,
+        approved_date_c: leaveData.approvedDate || null,
+        rejection_reason_c: leaveData.rejectionReason || null
+      };
+
+      const params = {
+        records: [dbData]
+      };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create leave ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        if (successfulRecords.length > 0) {
+          const newLeave = successfulRecords[0].data;
+          return {
+            Id: newLeave.Id,
+            employeeId: newLeave.employee_id_c?.Id || newLeave.employee_id_c,
+            startDate: newLeave.start_date_c || '',
+            endDate: newLeave.end_date_c || '',
+            type: newLeave.type_c || '',
+            status: newLeave.status_c || 'Pending',
+            reason: newLeave.reason_c || '',
+            requestDate: newLeave.request_date_c || '',
+            approvedBy: newLeave.approved_by_c || null,
+            approvedDate: newLeave.approved_date_c || null,
+            rejectionReason: newLeave.rejection_reason_c || null
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Error creating leave:", error.message);
+      throw error;
+    }
   }
 
   async update(id, leaveData) {
-    await this.delay(400);
-    const index = this.leaves.findIndex(leave => leave.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Leave request not found");
+    try {
+      // Map UI fields to database fields, only Updateable fields
+      const dbData = {
+        Id: parseInt(id),
+        Name: `Leave Request - ${leaveData.type}`,
+        employee_id_c: parseInt(leaveData.employeeId),
+        start_date_c: leaveData.startDate,
+        end_date_c: leaveData.endDate,
+        type_c: leaveData.type || 'Vacation',
+        status_c: leaveData.status || 'Pending',
+        reason_c: leaveData.reason || '',
+        request_date_c: leaveData.requestDate || new Date().toISOString(),
+        approved_by_c: leaveData.approvedBy || null,
+        approved_date_c: leaveData.approvedDate || null,
+        rejection_reason_c: leaveData.rejectionReason || null
+      };
+
+      const params = {
+        records: [dbData]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update leave ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        if (successfulUpdates.length > 0) {
+          const updatedLeave = successfulUpdates[0].data;
+          return {
+            Id: updatedLeave.Id,
+            employeeId: updatedLeave.employee_id_c?.Id || updatedLeave.employee_id_c,
+            startDate: updatedLeave.start_date_c || '',
+            endDate: updatedLeave.end_date_c || '',
+            type: updatedLeave.type_c || '',
+            status: updatedLeave.status_c || 'Pending',
+            reason: updatedLeave.reason_c || '',
+            requestDate: updatedLeave.request_date_c || '',
+            approvedBy: updatedLeave.approved_by_c || null,
+            approvedDate: updatedLeave.approved_date_c || null,
+            rejectionReason: updatedLeave.rejection_reason_c || null
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Error updating leave:", error.message);
+      throw error;
     }
-    
-    this.leaves[index] = {
-      ...this.leaves[index],
-      ...leaveData,
-      Id: parseInt(id),
-    };
-    
-    return { ...this.leaves[index] };
   }
 
   async updateStatus(id, status, approvedBy = null, rejectionReason = null) {
-    await this.delay(300);
-    const index = this.leaves.findIndex(leave => leave.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Leave request not found");
+    try {
+      const currentLeave = await this.getById(id);
+      if (!currentLeave) {
+        throw new Error("Leave request not found");
+      }
+
+      const dbData = {
+        Id: parseInt(id),
+        status_c: status,
+        approved_by_c: status !== "Pending" ? approvedBy : null,
+        approved_date_c: status !== "Pending" ? new Date().toISOString() : null,
+        rejection_reason_c: status === "Rejected" ? rejectionReason : null
+      };
+
+      const params = {
+        records: [dbData]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update leave status ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        if (successfulUpdates.length > 0) {
+          const updatedLeave = successfulUpdates[0].data;
+          return {
+            Id: updatedLeave.Id,
+            employeeId: updatedLeave.employee_id_c?.Id || updatedLeave.employee_id_c,
+            startDate: updatedLeave.start_date_c || '',
+            endDate: updatedLeave.end_date_c || '',
+            type: updatedLeave.type_c || '',
+            status: updatedLeave.status_c || 'Pending',
+            reason: updatedLeave.reason_c || '',
+            requestDate: updatedLeave.request_date_c || '',
+            approvedBy: updatedLeave.approved_by_c || null,
+            approvedDate: updatedLeave.approved_date_c || null,
+            rejectionReason: updatedLeave.rejection_reason_c || null
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Error updating leave status:", error.message);
+      throw error;
     }
-    
-    this.leaves[index] = {
-      ...this.leaves[index],
-      status,
-      approvedBy: status !== "Pending" ? approvedBy : null,
-      approvedDate: status !== "Pending" ? new Date().toISOString() : null,
-      rejectionReason: status === "Rejected" ? rejectionReason : null
-    };
-    
-    return { ...this.leaves[index] };
   }
 
   async delete(id) {
-    await this.delay(300);
-    const index = this.leaves.findIndex(leave => leave.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Leave request not found");
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete leave ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+    } catch (error) {
+      console.error("Error deleting leave:", error.message);
+      throw error;
     }
-    
-    const deletedLeave = { ...this.leaves[index] };
-    this.leaves.splice(index, 1);
-    return deletedLeave;
   }
 
   async getLeavesByStatus(status) {
-    await this.delay(200);
-    if (!status) return [...this.leaves];
-    return this.leaves.filter(leave => leave.status === status);
+    if (!status) return await this.getAll();
+    
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "employee_id_c" } },
+          { field: { Name: "start_date_c" } },
+          { field: { Name: "end_date_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "reason_c" } },
+          { field: { Name: "request_date_c" } },
+          { field: { Name: "approved_by_c" } },
+          { field: { Name: "approved_date_c" } },
+          { field: { Name: "rejection_reason_c" } }
+        ],
+        where: [
+          {
+            FieldName: "status_c",
+            Operator: "EqualTo",
+            Values: [status]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      // Map database fields to UI fields
+      return response.data.map(leave => ({
+        Id: leave.Id,
+        employeeId: leave.employee_id_c?.Id || leave.employee_id_c,
+        startDate: leave.start_date_c || '',
+        endDate: leave.end_date_c || '',
+        type: leave.type_c || '',
+        status: leave.status_c || 'Pending',
+        reason: leave.reason_c || '',
+        requestDate: leave.request_date_c || '',
+        approvedBy: leave.approved_by_c || null,
+        approvedDate: leave.approved_date_c || null,
+        rejectionReason: leave.rejection_reason_c || null
+      }));
+    } catch (error) {
+      console.error("Error fetching leaves by status:", error.message);
+      return [];
+    }
   }
 
   async getUpcomingLeaves(days = 30) {
-    await this.delay(200);
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + days);
-    
-    return this.leaves.filter(leave => {
-      const leaveStart = new Date(leave.startDate);
-      const today = new Date();
-      return leaveStart >= today && leaveStart <= futureDate && leave.status === "Approved";
-    });
-  }
+    try {
+      const today = new Date().toISOString();
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + days);
+      const futureDateStr = futureDate.toISOString();
 
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "employee_id_c" } },
+          { field: { Name: "start_date_c" } },
+          { field: { Name: "end_date_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "reason_c" } },
+          { field: { Name: "request_date_c" } },
+          { field: { Name: "approved_by_c" } },
+          { field: { Name: "approved_date_c" } },
+          { field: { Name: "rejection_reason_c" } }
+        ],
+        whereGroups: [
+          {
+            operator: "AND",
+            subGroups: [
+              {
+                conditions: [
+                  {
+                    fieldName: "start_date_c",
+                    operator: "GreaterThanOrEqualTo",
+                    values: [today]
+                  }
+                ]
+              },
+              {
+                conditions: [
+                  {
+                    fieldName: "start_date_c",
+                    operator: "LessThanOrEqualTo",
+                    values: [futureDateStr]
+                  }
+                ]
+              },
+              {
+                conditions: [
+                  {
+                    fieldName: "status_c",
+                    operator: "EqualTo",
+                    values: ["Approved"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      // Map database fields to UI fields
+      return response.data.map(leave => ({
+        Id: leave.Id,
+        employeeId: leave.employee_id_c?.Id || leave.employee_id_c,
+        startDate: leave.start_date_c || '',
+        endDate: leave.end_date_c || '',
+        type: leave.type_c || '',
+        status: leave.status_c || 'Pending',
+        reason: leave.reason_c || '',
+        requestDate: leave.request_date_c || '',
+        approvedBy: leave.approved_by_c || null,
+        approvedDate: leave.approved_date_c || null,
+        rejectionReason: leave.rejection_reason_c || null
+      }));
+    } catch (error) {
+      console.error("Error fetching upcoming leaves:", error.message);
+      return [];
+    }
   }
 }
 
