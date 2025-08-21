@@ -1,11 +1,20 @@
 class EmployeeService {
-  constructor() {
-    const { ApperClient } = window.ApperSDK;
-    this.apperClient = new ApperClient({
-      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-    });
-    this.tableName = 'employee_c';
+constructor() {
+    try {
+      if (!window.ApperSDK) {
+        throw new Error('ApperSDK not loaded. Please ensure the SDK script is properly included.');
+      }
+      const { ApperClient } = window.ApperSDK;
+      this.apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+      this.tableName = 'employee_c';
+    } catch (error) {
+      console.error('Failed to initialize EmployeeService:', error.message);
+      this.apperClient = null;
+      this.tableName = 'employee_c';
+    }
   }
 
   async getAll() {
